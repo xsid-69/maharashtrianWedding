@@ -1,0 +1,530 @@
+/* ==========================================================================
+   The week: sticky-stacked ceremonial plates
+
+   Each ceremony is a full-bleed plate pinned to the top of the viewport while the
+   next one rises over it, so the five days physically accumulate into one week.
+
+   Two rules hold this section together:
+
+   1. SHAPE. Full-bleed surfaces are square, radius 0. Only interactive controls are
+      pill shaped. No card radii, no arches, no plaques.
+   2. COLOUR. Gold is the only interface accent, page-wide. Each ceremony's colour
+      lives exclusively in the wash over its photograph, never in the UI, so five
+      ceremonies cannot turn the layout into a palette demo.
+
+   No cards, no alternating image-text splits, and one eyebrow for the whole section.
+   ========================================================================== */
+
+.section {
+  position: relative;
+  padding-top: clamp(5.5rem, 13vw, 9rem);
+  background: var(--burgundy-deep);
+  color: var(--ivory);
+}
+
+/* --- header: stacked, never a split ---------------------------------------- */
+
+.header {
+  padding-bottom: clamp(3rem, 8vw, 5.5rem);
+}
+
+.kicker {
+  display: block;
+  margin-bottom: 1.25rem;
+  color: var(--gold-light);
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+.title {
+  max-width: 22ch;
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.9rem, 12vw, 6rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+}
+
+.lede {
+  max-width: 46ch;
+  margin-top: 1.75rem;
+  color: color-mix(in oklch, var(--ivory) 72%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
+/* --- the stack ------------------------------------------------------------- */
+
+.stack {
+  position: relative;
+  background: var(--burgundy-deep);
+}
+
+/*
+ * `min-height` rather than a fixed height, and never `overflow: hidden` on the plate
+ * itself. A pinned element taller than the viewport keeps its overflow permanently
+ * below the fold and unreachable, so clipping here would silently hide a venue or a
+ * dress code from anyone on a short screen.
+ */
+.plate {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 100dvh;
+  background: var(--burgundy-deep);
+  transform-origin: center top;
+}
+
+/*
+ * The stack itself: sticky siblings of one tall parent, so later siblings paint over
+ * earlier ones. Pure CSS, nothing to refresh on resize, and it survives a smooth-scroll
+ * library untouched.
+ *
+ * Only engaged when the viewport is tall enough to hold a whole plate. Below that
+ * (landscape phones, small windows) the plates fall back to an ordinary sequence, which
+ * is the honest behaviour: no pinning means nothing can end up stranded off-screen.
+ */
+@media (min-height: 40rem) {
+  .plate {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.media img {
+  object-fit: cover;
+  object-position: center 38%;
+  filter: saturate(0.96) contrast(1.02);
+}
+
+/* Per-ceremony colour, applied to the photograph only. `soft-light` warms and shifts
+   the image while keeping its highlights, so it still reads as a photograph rather
+   than a flat duotone. */
+.grade {
+  position: absolute;
+  inset: 0;
+  background: var(--grade);
+  mix-blend-mode: soft-light;
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+/* Legibility bed for the bottom-left type block. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(14, 1, 6, 0.9) 0%,
+      rgba(16, 2, 8, 0.62) 34%,
+      rgba(18, 2, 9, 0.2) 66%,
+      rgba(20, 2, 10, 0.44) 100%
+    ),
+    linear-gradient(105deg, rgba(14, 1, 6, 0.6), transparent 62%);
+  pointer-events: none;
+}
+
+/* Recede cue, driven by the next plate's scroll position. */
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--burgundy-deep);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- plate content -------------------------------------------------------- */
+
+.body {
+  position: relative;
+  z-index: 2;
+  padding-bottom: clamp(4.5rem, 11vh, 7rem);
+}
+
+.day {
+  margin: 0 0 1rem;
+  color: var(--gold-light);
+  font-family: var(--display);
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+
+.name {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(3.1rem, 15vw, 8rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+}
+
+/* Devanagari set as real display type at a legible size, not a faint watermark
+   floating over the photograph. */
+.hindi {
+  margin-bottom: 0.15em;
+  color: var(--gold-light);
+  font-size: 0.34em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.ritual {
+  max-width: 30ch;
+  margin: 0.9rem 0 0;
+  color: color-mix(in oklch, var(--ivory) 88%, transparent);
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.copy {
+  max-width: 44ch;
+  margin: 1.15rem 0 0;
+  color: color-mix(in oklch, var(--ivory) 74%, transparent);
+  font-size: 0.87rem;
+  line-height: 1.75;
+}
+
+/* Three plain columns. No hairline under every row. */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem 1.75rem;
+  margin: 1.9rem 0 0;
+}
+
+.facts > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.facts dt {
+  margin-bottom: 0.3rem;
+  color: color-mix(in oklch, var(--ivory) 52%, transparent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--ivory);
+  font-family: var(--display);
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+/* Interactive controls are the only pill shapes in the section. */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  margin-top: 1.9rem;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid color-mix(in oklch, var(--gold-light) 52%, transparent);
+  border-radius: 999px;
+  color: var(--ivory);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+
+.link svg {
+  transition: transform 300ms var(--ease-out);
+}
+
+/* --- edge index ----------------------------------------------------------- */
+
+.index {
+  display: none;
+}
+
+/* --- closing note --------------------------------------------------------- */
+
+.closing {
+  padding-block: clamp(4rem, 10vw, 7rem);
+}
+
+.closing h3 {
+  max-width: 24ch;
+  margin: 0 0 0.9rem;
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 7vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+
+.closing p {
+  max-width: 44ch;
+  margin: 0 0 1.75rem;
+  color: color-mix(in oklch, var(--ivory) 72%, transparent);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}
+
+.closing a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.6rem 1.3rem;
+  border: 1px solid var(--gold-light);
+  border-radius: 999px;
+  color: var(--ivory);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.closing a svg {
+  transition: transform 300ms var(--ease-out);
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (min-width: 48rem) {
+  .facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 46rem;
+    gap: 1.75rem;
+  }
+
+  .facts > div:last-child {
+    grid-column: auto;
+  }
+
+  .ritual {
+    max-width: 34ch;
+  }
+}
+
+/* ==========================================================================
+   Desktop: wider type block, persistent edge index
+   ========================================================================== */
+
+@media (min-width: 64rem) {
+  .body {
+    padding-bottom: clamp(5rem, 12vh, 8rem);
+  }
+
+  .name {
+    font-size: clamp(5rem, 9vw, 9rem);
+  }
+
+  .copy {
+    max-width: 48ch;
+  }
+
+  .link:hover,
+  .link:focus-visible,
+  .closing a:hover,
+  .closing a:focus-visible {
+    border-color: var(--gold-light);
+    background: var(--gold-light);
+    color: var(--burgundy-deep);
+  }
+
+  .link:hover svg,
+  .closing a:hover svg {
+    transform: translate(2px, -2px);
+  }
+
+  /* Wayfinding, not decoration: the stack is five viewports tall, so the guest needs
+     to know which day they are looking at and be able to skip to another. Sticky and
+     lifted above the plates rather than repeated inside each one. */
+  .index {
+    display: none;
+  }
+}
+
+@media (min-width: 64rem) and (min-height: 40rem) {
+  .index {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100dvh;
+    padding-right: clamp(1.5rem, 3vw, 3rem);
+    pointer-events: none;
+  }
+
+  .index ol {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: auto;
+  }
+
+  .indexItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    padding: 0.2rem 0;
+    border: 0;
+    background: transparent;
+    color: color-mix(in oklch, var(--ivory) 46%, transparent);
+    cursor: pointer;
+    font-size: 0.6rem;
+    font-weight: 750;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transition: color 300ms ease;
+  }
+
+  .indexRule {
+    width: 1.4rem;
+    height: 1px;
+    background: currentColor;
+    transition: width 380ms var(--ease-out), background-color 300ms ease;
+  }
+
+  .indexItem:hover,
+  .indexItem:focus-visible {
+    color: color-mix(in oklch, var(--ivory) 82%, transparent);
+  }
+
+  .indexItem[data-active="true"] {
+    color: var(--gold-light);
+  }
+
+  .indexItem[data-active="true"] .indexRule {
+    width: 3.2rem;
+    background: var(--gold-light);
+  }
+
+  .indexLabel {
+    min-width: 5.5rem;
+    text-align: left;
+  }
+}
+
+/* ==========================================================================
+   The wedding day reads differently from the rest of the week
+   ========================================================================== */
+
+@media (min-width: 64rem) {
+  .plate[data-featured="true"] {
+    align-items: center;
+    text-align: center;
+  }
+
+  .plate[data-featured="true"] .body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0;
+  }
+
+  .plate[data-featured="true"] .name {
+    align-items: center;
+    font-size: clamp(6rem, 11vw, 11rem);
+  }
+
+  .plate[data-featured="true"] .facts {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .plate[data-featured="true"] .scrim {
+    background:
+      radial-gradient(90% 70% at 50% 60%, rgba(14, 1, 6, 0.82), rgba(16, 2, 8, 0.42) 70%),
+      linear-gradient(to top, rgba(14, 1, 6, 0.72), transparent 55%);
+  }
+}
+
+/* ==========================================================================
+   Preferences
+   ========================================================================== */
+
+/* ==========================================================================
+   Short viewports: compact the type so a plate still fits without pinning
+   ========================================================================== */
+
+@media (max-height: 39.999rem) {
+  .plate {
+    min-height: 34rem;
+  }
+
+  .name {
+    font-size: clamp(2.5rem, 10vw, 3.6rem);
+  }
+
+  .hindi {
+    font-size: 0.4em;
+  }
+
+  .ritual {
+    font-size: 1.1rem;
+  }
+
+  .facts {
+    margin-top: 1.35rem;
+  }
+
+  .link {
+    margin-top: 1.35rem;
+  }
+}
+
+/* ==========================================================================
+   Preferences
+   ========================================================================== */
+
+@media (prefers-reduced-transparency: reduce) {
+  .grade {
+    mix-blend-mode: normal;
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No pinning and no overlap: the plates become an ordinary sequence of full-bleed
+     panels, which carries the same information without any scroll-linked motion. */
+  .plate {
+    position: static;
+    height: auto;
+    min-height: 100dvh;
+    transform: none;
+  }
+
+  .index {
+    display: none;
+  }
+
+  .link,
+  .link svg,
+  .closing a,
+  .closing a svg,
+  .indexRule {
+    transition-duration: 0.01ms;
+  }
+}
